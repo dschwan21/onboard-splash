@@ -2,202 +2,246 @@
 
 import { useState, useEffect } from 'react';
 
-// Custom hook for typing animation
-function useTypingEffect(text, speed = 60) {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isComplete, setIsComplete] = useState(false);
+// 3D Feature Carousel Component
+function Feature3DCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(2); // Start with middle card
+  const [isHovered, setIsHovered] = useState(false);
 
-  useEffect(() => {
-    setDisplayedText('');
-    setIsComplete(false);
-    let i = 0;
-    
-    const timer = setInterval(() => {
-      if (i < text.length) {
-        setDisplayedText(text.slice(0, i + 1));
-        i++;
-      } else {
-        setIsComplete(true);
-        clearInterval(timer);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [text, speed]);
-
-  return { displayedText, isComplete };
-}
-
-// Feature Carousel Component
-function FeatureCarousel() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(true);
-
-  const slides = [
+  const features = [
     {
+      id: 1,
       title: "AI Lesson Planner",
-      prompt: "Create a 50-minute lesson plan for 8th grade math on linear equations with hands-on activities",
-      response: {
-        title: "Introduction to Linear Equations",
-        objective: "Students will understand and solve basic linear equations using multiple methods",
-        materials: "Whiteboard, graphing paper, calculators, balance scales (manipulatives)",
-        activities: [
-          "Warm-up: Real-world equation examples (10 min)",
-          "Direct instruction: Solving methods (15 min)", 
-          "Guided practice: Balance scale activity (20 min)",
-          "Independent work: Problem set (15 min)"
-        ]
-      }
+      description: "Transform standards into complete lesson plans in seconds",
+      icon: "📚",
+      preview: {
+        input: "Create a 50-minute lesson on linear equations for 8th grade",
+        output: "✓ Learning objectives\n✓ Materials list\n✓ Step-by-step activities\n✓ Assessment rubric"
+      },
+      color: "from-blue-500 to-blue-600"
     },
     {
-      title: "Parent Email Assistant", 
-      prompt: "Draft a professional email to parents about a student's missing assignments with a supportive tone",
-      response: {
-        subject: "Supporting [Student Name] with Assignment Completion",
-        greeting: "Dear Mr. and Mrs. [Last Name],",
-        body: "I wanted to reach out regarding some missing assignments for [Student Name]. I've noticed they're struggling to keep up with recent math homework. I'd love to work together to support them. Could we schedule a brief conversation this week?",
-        closing: "Looking forward to partnering with you,"
-      }
+      id: 2,
+      title: "Parent Email Assistant",
+      description: "Draft professional, empathetic emails with the right tone",
+      icon: "📧",
+      preview: {
+        input: "Help communicate about missing assignments supportively",
+        output: "✓ Professional greeting\n✓ Supportive language\n✓ Clear action steps\n✓ Collaborative tone"
+      },
+      color: "from-green-500 to-green-600"
     },
     {
+      id: 3,
       title: "Quiz Generator",
-      prompt: "Generate a 10-question quiz on photosynthesis for 6th grade with multiple choice and short answer",
-      response: {
-        title: "Photosynthesis Quiz - 6th Grade",
-        questions: [
-          "Multiple Choice: What gas do plants release during photosynthesis? A) Oxygen B) Carbon dioxide C) Nitrogen",
-          "Short Answer: Name the two main ingredients plants need for photosynthesis",
-          "Multiple Choice: Where in the plant does photosynthesis occur? A) Roots B) Leaves C) Stem"
-        ],
-        answerKey: "Included with detailed explanations"
-      }
+      description: "Generate assessments by topic, grade level, and difficulty",
+      icon: "🧪",
+      preview: {
+        input: "Create a photosynthesis quiz for 6th grade science",
+        output: "✓ Multiple choice questions\n✓ Short answer prompts\n✓ Answer key included\n✓ Aligned to standards"
+      },
+      color: "from-purple-500 to-purple-600"
+    },
+    {
+      id: 4,
+      title: "Prompt Library",
+      description: "Browse hundreds of tested prompts by subject and grade",
+      icon: "📖",
+      preview: {
+        input: "Browse writing prompts for high school English",
+        output: "✓ Creative writing starters\n✓ Essay prompts\n✓ Discussion questions\n✓ Peer review guides"
+      },
+      color: "from-orange-500 to-orange-600"
+    },
+    {
+      id: 5,
+      title: "PDP Submission",
+      description: "Track progress and submit for professional development credit",
+      icon: "🎓",
+      preview: {
+        input: "Submit completed AI training for PDP credit",
+        output: "✓ Progress tracking\n✓ Certificate generation\n✓ Hour documentation\n✓ District submission"
+      },
+      color: "from-indigo-500 to-indigo-600"
     }
   ];
 
-  const { displayedText: currentPrompt, isComplete: promptComplete } = useTypingEffect(
-    slides[currentSlide].prompt,
-    60
-  );
-
-  // Auto-advance slides
+  // Auto-advance with pause on hover
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-      setIsAnimating(true);
-    }, 8000); // 8 seconds per slide
-
-    return () => clearTimeout(timer);
-  }, [currentSlide, slides.length]);
+    if (!isHovered) {
+      const timer = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % features.length);
+      }, 6000);
+      return () => clearInterval(timer);
+    }
+  }, [isHovered, features.length]);
 
   const goToSlide = (index) => {
-    setCurrentSlide(index);
-    setIsAnimating(true);
+    setCurrentIndex(index);
+  };
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % features.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + features.length) % features.length);
+  };
+
+  const getCardStyle = (index) => {
+    const diff = index - currentIndex;
+    const totalCards = features.length;
+    
+    // Handle wrapping
+    let position = diff;
+    if (diff > totalCards / 2) position = diff - totalCards;
+    if (diff < -totalCards / 2) position = diff + totalCards;
+
+    if (position === 0) {
+      // Center card
+      return {
+        transform: 'translateX(0%) scale(1) rotateY(0deg)',
+        zIndex: 10,
+        opacity: 1,
+      };
+    } else if (position === -1) {
+      // Left card
+      return {
+        transform: 'translateX(-60%) scale(0.85) rotateY(30deg)',
+        zIndex: 5,
+        opacity: 0.6,
+      };
+    } else if (position === 1) {
+      // Right card
+      return {
+        transform: 'translateX(60%) scale(0.85) rotateY(-30deg)',
+        zIndex: 5,
+        opacity: 0.6,
+      };
+    } else if (position === -2) {
+      // Far left card
+      return {
+        transform: 'translateX(-120%) scale(0.7) rotateY(45deg)',
+        zIndex: 1,
+        opacity: 0.3,
+      };
+    } else if (position === 2) {
+      // Far right card
+      return {
+        transform: 'translateX(120%) scale(0.7) rotateY(-45deg)',
+        zIndex: 1,
+        opacity: 0.3,
+      };
+    } else {
+      // Hidden cards
+      return {
+        transform: 'translateX(200%) scale(0.5) rotateY(60deg)',
+        zIndex: 0,
+        opacity: 0,
+      };
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Feature Label */}
-      <div className="text-center mb-4">
-        <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-          {slides[currentSlide].title}
-        </span>
+    <div className="relative w-full max-w-6xl mx-auto px-4">
+      {/* Carousel Container */}
+      <div 
+        className="carousel-3d relative h-96 md:h-[500px] overflow-hidden"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{ perspective: '1000px' }}
+      >
+        {features.map((feature, index) => (
+          <div
+            key={feature.id}
+            className={`card-3d absolute top-0 left-1/2 w-80 md:w-96 h-full cursor-pointer transition-all duration-500 ease-out ${
+              index === currentIndex ? 'active' : ''
+            }`}
+            style={{
+              ...getCardStyle(index),
+              transformOrigin: 'center center',
+              marginLeft: '-160px', // Half of card width for centering
+            }}
+            onClick={() => goToSlide(index)}
+          >
+            {/* Feature Card */}
+            <div className="w-full h-full bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden">
+              {/* Card Header */}
+              <div className={`h-16 bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
+                <span className="text-3xl">{feature.icon}</span>
+              </div>
+              
+              {/* Card Content */}
+              <div className="p-6 space-y-4">
+                <div className="text-center">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-gray-600 text-sm">{feature.description}</p>
+                </div>
+
+                {/* Preview Box */}
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="text-xs text-gray-500 uppercase tracking-wide">Preview</div>
+                  
+                  {/* Input */}
+                  <div className="text-xs">
+                    <div className="text-gray-600 mb-1">Input:</div>
+                    <div className="bg-blue-50 p-2 rounded border-l-2 border-blue-400 text-gray-800">
+                      {feature.preview.input}
+                    </div>
+                  </div>
+
+                  {/* Output */}
+                  <div className="text-xs">
+                    <div className="text-gray-600 mb-1">Output:</div>
+                    <div className="bg-green-50 p-2 rounded border-l-2 border-green-400 text-gray-800 whitespace-pre-line">
+                      {feature.preview.output}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Browser Window */}
-      <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
-        {/* Browser Header */}
-        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-            <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-          </div>
-          <div className="flex-1 mx-4">
-            <div className="bg-white rounded-md px-3 py-1 text-sm text-gray-600 border">
-              onboard.ai/tools/{slides[currentSlide].title.toLowerCase().replace(' ', '-')}
-            </div>
-          </div>
-        </div>
+      {/* Navigation Arrows */}
+      <div className="navigation-arrows">
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all z-20 md:flex hidden"
+        >
+          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
 
-        {/* Content Area */}
-        <div className="p-6 space-y-6">
-          {/* Prompt Input */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Your Prompt</label>
-            <div className="relative">
-              <textarea
-                className="w-full p-4 border border-gray-300 rounded-lg resize-none bg-gray-50 text-gray-800 font-mono text-sm"
-                rows="3"
-                value={currentPrompt}
-                readOnly
-              />
-              {!promptComplete && (
-                <div className="absolute bottom-4 right-4 w-0.5 h-4 bg-blue-500 animate-pulse"></div>
-              )}
-            </div>
-          </div>
-
-          {/* AI Response */}
-          <div className={`space-y-2 transition-all duration-500 ${
-            promptComplete ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-          }`}>
-            <label className="block text-sm font-medium text-gray-700">AI Response</label>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
-              {slides[currentSlide].response.title && (
-                <div>
-                  <strong className="text-green-800">Lesson Title:</strong>
-                  <p className="text-green-700">{slides[currentSlide].response.title}</p>
-                </div>
-              )}
-              {slides[currentSlide].response.objective && (
-                <div>
-                  <strong className="text-green-800">Objective:</strong>
-                  <p className="text-green-700">{slides[currentSlide].response.objective}</p>
-                </div>
-              )}
-              {slides[currentSlide].response.materials && (
-                <div>
-                  <strong className="text-green-800">Materials:</strong>
-                  <p className="text-green-700">{slides[currentSlide].response.materials}</p>
-                </div>
-              )}
-              {slides[currentSlide].response.subject && (
-                <div>
-                  <strong className="text-green-800">Subject:</strong>
-                  <p className="text-green-700">{slides[currentSlide].response.subject}</p>
-                </div>
-              )}
-              {slides[currentSlide].response.body && (
-                <div>
-                  <p className="text-green-700">{slides[currentSlide].response.body}</p>
-                </div>
-              )}
-              {slides[currentSlide].response.questions && (
-                <div>
-                  <strong className="text-green-800">Sample Questions:</strong>
-                  <ul className="list-disc list-inside text-green-700 space-y-1">
-                    {slides[currentSlide].response.questions.slice(0, 2).map((question, idx) => (
-                      <li key={idx} className="text-sm">{question}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all z-20 md:flex hidden"
+        >
+          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
 
-      {/* Slide Indicators */}
-      <div className="flex justify-center mt-6 space-x-2">
-        {slides.map((_, index) => (
+      {/* Dot Indicators */}
+      <div className="flex justify-center mt-8 space-x-2">
+        {features.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
             className={`w-3 h-3 rounded-full transition-all ${
-              index === currentSlide ? 'bg-blue-500' : 'bg-gray-300 hover:bg-gray-400'
+              index === currentIndex ? 'bg-blue-500 w-8' : 'bg-gray-300 hover:bg-gray-400'
             }`}
           />
         ))}
+      </div>
+
+      {/* Caption */}
+      <div className="text-center mt-6">
+        <p className="text-gray-600 text-lg font-medium">
+          Real tools for real classrooms — see what Onboard can do.
+        </p>
       </div>
     </div>
   );
@@ -230,9 +274,9 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Feature Carousel */}
+          {/* 3D Feature Carousel */}
           <div className="mt-16">
-            <FeatureCarousel />
+            <Feature3DCarousel />
           </div>
         </div>
       </section>

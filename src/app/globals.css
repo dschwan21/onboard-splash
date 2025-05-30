@@ -105,3 +105,27 @@ body {
     padding: 6rem 2rem;
   }
 }
+
+/* 3D Carousel Mobile Styles */
+@media (max-width: 768px) {
+  .carousel-3d {
+    perspective: none;
+  }
+  
+  .carousel-3d .card-3d {
+    transform: none !important;
+    opacity: 1 !important;
+    position: relative !important;
+    width: 90vw !important;
+    margin: 0 auto !important;
+    display: none;
+  }
+  
+  .carousel-3d .card-3d.active {
+    display: block;
+  }
+  
+  .carousel-3d .navigation-arrows {
+    display: none;
+  }
+}
