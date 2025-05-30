@@ -1,6 +1,207 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+// Custom hook for typing animation
+function useTypingEffect(text, speed = 60) {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    setDisplayedText('');
+    setIsComplete(false);
+    let i = 0;
+    
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        setDisplayedText(text.slice(0, i + 1));
+        i++;
+      } else {
+        setIsComplete(true);
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return { displayedText, isComplete };
+}
+
+// Feature Carousel Component
+function FeatureCarousel() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(true);
+
+  const slides = [
+    {
+      title: "AI Lesson Planner",
+      prompt: "Create a 50-minute lesson plan for 8th grade math on linear equations with hands-on activities",
+      response: {
+        title: "Introduction to Linear Equations",
+        objective: "Students will understand and solve basic linear equations using multiple methods",
+        materials: "Whiteboard, graphing paper, calculators, balance scales (manipulatives)",
+        activities: [
+          "Warm-up: Real-world equation examples (10 min)",
+          "Direct instruction: Solving methods (15 min)", 
+          "Guided practice: Balance scale activity (20 min)",
+          "Independent work: Problem set (15 min)"
+        ]
+      }
+    },
+    {
+      title: "Parent Email Assistant", 
+      prompt: "Draft a professional email to parents about a student's missing assignments with a supportive tone",
+      response: {
+        subject: "Supporting [Student Name] with Assignment Completion",
+        greeting: "Dear Mr. and Mrs. [Last Name],",
+        body: "I wanted to reach out regarding some missing assignments for [Student Name]. I've noticed they're struggling to keep up with recent math homework. I'd love to work together to support them. Could we schedule a brief conversation this week?",
+        closing: "Looking forward to partnering with you,"
+      }
+    },
+    {
+      title: "Quiz Generator",
+      prompt: "Generate a 10-question quiz on photosynthesis for 6th grade with multiple choice and short answer",
+      response: {
+        title: "Photosynthesis Quiz - 6th Grade",
+        questions: [
+          "Multiple Choice: What gas do plants release during photosynthesis? A) Oxygen B) Carbon dioxide C) Nitrogen",
+          "Short Answer: Name the two main ingredients plants need for photosynthesis",
+          "Multiple Choice: Where in the plant does photosynthesis occur? A) Roots B) Leaves C) Stem"
+        ],
+        answerKey: "Included with detailed explanations"
+      }
+    }
+  ];
+
+  const { displayedText: currentPrompt, isComplete: promptComplete } = useTypingEffect(
+    slides[currentSlide].prompt,
+    60
+  );
+
+  // Auto-advance slides
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+      setIsAnimating(true);
+    }, 8000); // 8 seconds per slide
+
+    return () => clearTimeout(timer);
+  }, [currentSlide, slides.length]);
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+    setIsAnimating(true);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      {/* Feature Label */}
+      <div className="text-center mb-4">
+        <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+          {slides[currentSlide].title}
+        </span>
+      </div>
+
+      {/* Browser Window */}
+      <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+        {/* Browser Header */}
+        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+          </div>
+          <div className="flex-1 mx-4">
+            <div className="bg-white rounded-md px-3 py-1 text-sm text-gray-600 border">
+              onboard.ai/tools/{slides[currentSlide].title.toLowerCase().replace(' ', '-')}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="p-6 space-y-6">
+          {/* Prompt Input */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Your Prompt</label>
+            <div className="relative">
+              <textarea
+                className="w-full p-4 border border-gray-300 rounded-lg resize-none bg-gray-50 text-gray-800 font-mono text-sm"
+                rows="3"
+                value={currentPrompt}
+                readOnly
+              />
+              {!promptComplete && (
+                <div className="absolute bottom-4 right-4 w-0.5 h-4 bg-blue-500 animate-pulse"></div>
+              )}
+            </div>
+          </div>
+
+          {/* AI Response */}
+          <div className={`space-y-2 transition-all duration-500 ${
+            promptComplete ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+          }`}>
+            <label className="block text-sm font-medium text-gray-700">AI Response</label>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
+              {slides[currentSlide].response.title && (
+                <div>
+                  <strong className="text-green-800">Lesson Title:</strong>
+                  <p className="text-green-700">{slides[currentSlide].response.title}</p>
+                </div>
+              )}
+              {slides[currentSlide].response.objective && (
+                <div>
+                  <strong className="text-green-800">Objective:</strong>
+                  <p className="text-green-700">{slides[currentSlide].response.objective}</p>
+                </div>
+              )}
+              {slides[currentSlide].response.materials && (
+                <div>
+                  <strong className="text-green-800">Materials:</strong>
+                  <p className="text-green-700">{slides[currentSlide].response.materials}</p>
+                </div>
+              )}
+              {slides[currentSlide].response.subject && (
+                <div>
+                  <strong className="text-green-800">Subject:</strong>
+                  <p className="text-green-700">{slides[currentSlide].response.subject}</p>
+                </div>
+              )}
+              {slides[currentSlide].response.body && (
+                <div>
+                  <p className="text-green-700">{slides[currentSlide].response.body}</p>
+                </div>
+              )}
+              {slides[currentSlide].response.questions && (
+                <div>
+                  <strong className="text-green-800">Sample Questions:</strong>
+                  <ul className="list-disc list-inside text-green-700 space-y-1">
+                    {slides[currentSlide].response.questions.slice(0, 2).map((question, idx) => (
+                      <li key={idx} className="text-sm">{question}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Slide Indicators */}
+      <div className="flex justify-center mt-6 space-x-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`w-3 h-3 rounded-full transition-all ${
+              index === currentSlide ? 'bg-blue-500' : 'bg-gray-300 hover:bg-gray-400'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState(null);
@@ -29,34 +230,9 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Hero Visual */}
-          <div className="mt-16 max-w-4xl mx-auto">
-            <div className="card bg-white shadow-xl border-2 border-gray-100">
-              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 rounded-t-xl">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                  <span className="ml-4 text-sm text-gray-600 font-mono">AI Lesson Planner</span>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-                    <p className="text-sm text-gray-600 mb-2">📝 Prompt:</p>
-                    <p className="text-gray-800">&quot;Create a 50-minute lesson plan for 8th grade math on linear equations...&quot;</p>
-                  </div>
-                  <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
-                    <p className="text-sm text-gray-600 mb-2">🤖 AI Response:</p>
-                    <div className="space-y-2 text-gray-800">
-                      <p><strong>Lesson Title:</strong> Introduction to Linear Equations</p>
-                      <p><strong>Objective:</strong> Students will understand and solve basic linear equations...</p>
-                      <p><strong>Materials:</strong> Whiteboard, graphing paper, calculators...</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Feature Carousel */}
+          <div className="mt-16">
+            <FeatureCarousel />
           </div>
         </div>
       </section>
