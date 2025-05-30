@@ -2,6 +2,128 @@
 
 import { useState, useEffect } from 'react';
 
+// AI Chat Header Component
+function ChatHeader({ title }) {
+  return (
+    <div className="px-4 py-3 flex items-center justify-between" style={{backgroundColor: '#2f2f2f', borderBottom: '1px solid #4a4a4a'}}>
+      {/* Left side - Generic AI chat */}
+      <div className="flex items-center space-x-3">
+        <div className="text-white text-sm font-medium">
+          {title}
+        </div>
+      </div>
+      
+      {/* Right side - Share button */}
+      <div className="flex items-center space-x-2">
+        <button className="text-white/70 text-sm px-3 py-1 rounded-md hover:bg-white/10 transition-colors">
+          Share
+        </button>
+        <button className="text-white/70 hover:text-white">
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ChatGPT Dark Mode Message Component
+function ChatMessage({ content, isUser, delay = 0 }) {
+  const [displayedText, setDisplayedText] = useState('');
+  const [showCursor, setShowCursor] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    if (!isUser && content) {
+      const timer = setTimeout(() => {
+        setIsTyping(true);
+        setShowCursor(true);
+        
+        let index = 0;
+        const typeTimer = setInterval(() => {
+          if (index < content.length) {
+            setDisplayedText(content.slice(0, index + 1));
+            index++;
+          } else {
+            setShowCursor(false);
+            setIsTyping(false);
+            clearInterval(typeTimer);
+          }
+        }, 60);
+        
+        return () => clearInterval(typeTimer);
+      }, delay);
+      
+      return () => clearTimeout(timer);
+    } else {
+      setDisplayedText(content);
+    }
+  }, [content, isUser, delay]);
+
+  if (isUser) {
+    return (
+      <div className="flex justify-end mb-6">
+        <div className="max-w-[70%] text-right">
+          <div className="text-white/80 text-sm mb-2">You</div>
+          <div className="text-white text-sm leading-relaxed">
+            {content}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex mb-6">
+      <div className="max-w-[85%]">
+        <div className="flex items-center mb-2">
+          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-2">
+            <span className="text-white text-xs font-bold">AI</span>
+          </div>
+          <div className="text-white/80 text-sm">AI Assistant</div>
+        </div>
+        <div className="text-white text-sm leading-relaxed">
+          <span>
+            {displayedText}
+            {showCursor && <span className="animate-pulse text-white/60">|</span>}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ChatGPT Dark Mode Interface Component
+function ChatInterface({ prompt, response, isActive, title }) {
+  return (
+    <div className="flex-1 px-6 py-6 font-[var(--font-inter)]" style={{backgroundColor: '#212121'}}>
+      <ChatMessage content={prompt} isUser={true} />
+      {isActive && (
+        <ChatMessage 
+          content={response} 
+          isUser={false} 
+          delay={800}
+        />
+      )}
+      
+      {/* Input area simulation */}
+      <div className="mt-6 pt-4" style={{borderTop: '1px solid #4a4a4a'}}>
+        <div className="flex items-center space-x-3 px-4 py-3 rounded-lg" style={{backgroundColor: '#2f2f2f', border: '1px solid #4a4a4a'}}>
+          <div className="text-white/40 text-sm flex-1">
+            Message AI Assistant...
+          </div>
+          <div className="w-6 h-6 bg-white/10 rounded flex items-center justify-center">
+            <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // 3D Feature Carousel Component
 function Feature3DCarousel() {
   const [currentIndex, setCurrentIndex] = useState(2); // Start with middle card
@@ -11,57 +133,37 @@ function Feature3DCarousel() {
     {
       id: 1,
       title: "AI Lesson Planner",
-      description: "Transform standards into complete lesson plans in seconds",
-      icon: "📚",
-      preview: {
-        input: "Create a 50-minute lesson on linear equations for 8th grade",
-        output: "✓ Learning objectives\n✓ Materials list\n✓ Step-by-step activities\n✓ Assessment rubric"
-      },
-      color: "from-blue-500 to-blue-600"
+      url: "onboard.ai/tools/lesson-planner",
+      prompt: "Create a 50-minute lesson on linear equations for 8th grade",
+      response: "Here's your complete lesson plan:\n\n**Learning Objectives:**\n• Students will solve one-step linear equations\n• Students will identify real-world applications\n\n**Materials:**\n• Graphing calculators\n• Worksheet packet\n• Interactive whiteboard\n\n**Activities:**\n1. Warm-up review (10 min)\n2. Direct instruction (15 min)\n3. Guided practice (20 min)\n4. Exit ticket (5 min)"
     },
     {
       id: 2,
       title: "Parent Email Assistant",
-      description: "Draft professional, empathetic emails with the right tone",
-      icon: "📧",
-      preview: {
-        input: "Help communicate about missing assignments supportively",
-        output: "✓ Professional greeting\n✓ Supportive language\n✓ Clear action steps\n✓ Collaborative tone"
-      },
-      color: "from-green-500 to-green-600"
+      url: "onboard.ai/tools/email-assistant",
+      prompt: "Draft a professional email to parents about missing assignments",
+      response: "**Subject:** Partnership Opportunity - Supporting [Student Name]'s Success\n\nDear [Parent Name],\n\nI hope this message finds you well. I'm reaching out because I believe in [Student Name]'s potential and want to work together to support their continued growth.\n\nI've noticed a few recent assignments that haven't been submitted, and I'd love to collaborate with you to help [Student Name] get back on track...\n\nWould you be available for a brief conversation this week?"
     },
     {
       id: 3,
       title: "Quiz Generator",
-      description: "Generate assessments by topic, grade level, and difficulty",
-      icon: "🧪",
-      preview: {
-        input: "Create a photosynthesis quiz for 6th grade science",
-        output: "✓ Multiple choice questions\n✓ Short answer prompts\n✓ Answer key included\n✓ Aligned to standards"
-      },
-      color: "from-purple-500 to-purple-600"
+      url: "onboard.ai/tools/quiz-generator",
+      prompt: "Create a photosynthesis quiz for 6th grade science",
+      response: "**Photosynthesis Quiz - 6th Grade**\n\n**Multiple Choice:**\n1. What do plants need for photosynthesis?\n   a) Water and carbon dioxide\n   b) Sunlight and oxygen\n   c) Water, carbon dioxide, and sunlight ✓\n\n**Short Answer:**\n2. Explain why leaves are green.\n\n**Word Bank:** chlorophyll, glucose, oxygen, carbon dioxide"
     },
     {
       id: 4,
       title: "Prompt Library",
-      description: "Browse hundreds of tested prompts by subject and grade",
-      icon: "📖",
-      preview: {
-        input: "Browse writing prompts for high school English",
-        output: "✓ Creative writing starters\n✓ Essay prompts\n✓ Discussion questions\n✓ Peer review guides"
-      },
-      color: "from-orange-500 to-orange-600"
+      url: "onboard.ai/tools/prompt-library",
+      prompt: "Browse writing prompts for high school English",
+      response: "**Featured Writing Prompts:**\n\n**Creative Writing:**\n• \"Write from the perspective of an object in your bedroom\"\n• \"Describe a world where music is illegal\"\n\n**Analytical Essays:**\n• \"How does symbolism enhance theme in Romeo & Juliet?\"\n• \"Compare conflict resolution in two novels\"\n\n**Discussion Starters:**\n• \"Should social media be taught as a literacy?\""
     },
     {
       id: 5,
       title: "PDP Submission",
-      description: "Track progress and submit for professional development credit",
-      icon: "🎓",
-      preview: {
-        input: "Submit completed AI training for PDP credit",
-        output: "✓ Progress tracking\n✓ Certificate generation\n✓ Hour documentation\n✓ District submission"
-      },
-      color: "from-indigo-500 to-indigo-600"
+      url: "onboard.ai/tools/pdp-tracker",
+      prompt: "Submit completed AI training for PDP credit",
+      response: "**Submission Confirmed** ✓\n\n**Course:** AI Tools for Educators\n**Hours Completed:** 6.5\n**Verification Code:** EDU-2024-1127\n\n**Next Steps:**\n• Certificate will be emailed within 24 hours\n• Transcript updated automatically\n• District notification sent\n\n**Progress:** 6.5/6 hours complete"
     }
   ];
 
@@ -153,50 +255,36 @@ function Feature3DCarousel() {
         {features.map((feature, index) => (
           <div
             key={feature.id}
-            className={`card-3d absolute top-0 left-1/2 w-80 md:w-96 h-full cursor-pointer transition-all duration-500 ease-out ${
+            className={`card-3d absolute top-0 left-1/2 w-[420px] md:w-[480px] h-full cursor-pointer transition-all duration-500 ease-out ${
               index === currentIndex ? 'active' : ''
             }`}
             style={{
               ...getCardStyle(index),
               transformOrigin: 'center center',
-              marginLeft: '-160px', // Half of card width for centering
+              marginLeft: '-210px', // Half of card width for centering (420px / 2)
             }}
             onClick={() => goToSlide(index)}
           >
-            {/* Feature Card */}
-            <div className="w-full h-full bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden">
-              {/* Card Header */}
-              <div className={`h-16 bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
-                <span className="text-3xl">{feature.icon}</span>
-              </div>
+            {/* ChatGPT Dark Mode Card */}
+            <div 
+              className={`w-full h-full rounded-xl border overflow-hidden transition-all duration-300 ${
+                index === currentIndex 
+                  ? 'shadow-[0_25px_60px_rgba(0,0,0,0.3)]' 
+                  : 'shadow-[0_20px_40px_rgba(0,0,0,0.2)]'
+              }`}
+              style={{backgroundColor: '#212121', borderColor: '#4a4a4a'}}
+            >
+              {/* ChatGPT Header */}
+              <ChatHeader title={feature.title} />
               
-              {/* Card Content */}
-              <div className="p-6 space-y-4">
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 text-sm">{feature.description}</p>
-                </div>
-
-                {/* Preview Box */}
-                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                  <div className="text-xs text-gray-500 uppercase tracking-wide">Preview</div>
-                  
-                  {/* Input */}
-                  <div className="text-xs">
-                    <div className="text-gray-600 mb-1">Input:</div>
-                    <div className="bg-blue-50 p-2 rounded border-l-2 border-blue-400 text-gray-800">
-                      {feature.preview.input}
-                    </div>
-                  </div>
-
-                  {/* Output */}
-                  <div className="text-xs">
-                    <div className="text-gray-600 mb-1">Output:</div>
-                    <div className="bg-green-50 p-2 rounded border-l-2 border-green-400 text-gray-800 whitespace-pre-line">
-                      {feature.preview.output}
-                    </div>
-                  </div>
-                </div>
+              {/* Chat Interface */}
+              <div className="flex flex-col h-96">
+                <ChatInterface 
+                  prompt={feature.prompt}
+                  response={feature.response}
+                  isActive={index === currentIndex}
+                  title={feature.title}
+                />
               </div>
             </div>
           </div>
