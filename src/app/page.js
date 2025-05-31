@@ -177,8 +177,38 @@ function Feature3DCarousel() {
     }
   }, [isHovered, features.length]);
 
+  // Handle mobile scroll positioning
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      const carousel = document.querySelector('.carousel-3d');
+      if (carousel) {
+        const cardWidth = carousel.querySelector('.card-3d')?.offsetWidth || 0;
+        const gap = 16;
+        const scrollPosition = currentIndex * (cardWidth + gap);
+        
+        carousel.scrollTo({
+          left: scrollPosition,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [currentIndex]);
+
   const goToSlide = (index) => {
     setCurrentIndex(index);
+    
+    // Handle mobile scrolling
+    if (window.innerWidth <= 768) {
+      const carousel = document.querySelector('.carousel-3d');
+      const cardWidth = carousel.querySelector('.card-3d').offsetWidth;
+      const gap = 16; // gap between cards
+      const scrollPosition = index * (cardWidth + gap);
+      
+      carousel.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const nextSlide = () => {

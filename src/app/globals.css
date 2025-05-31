@@ -110,19 +110,33 @@ body {
 @media (max-width: 768px) {
   .carousel-3d {
     perspective: none;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 24px;
+    gap: 16px;
+    height: auto !important;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  .carousel-3d::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
   
   .carousel-3d .card-3d {
     transform: none !important;
     opacity: 1 !important;
     position: relative !important;
-    width: 90vw !important;
-    margin: 0 auto !important;
-    display: none;
-  }
-  
-  .carousel-3d .card-3d.active {
-    display: block;
+    width: calc(100vw - 64px) !important;
+    min-width: calc(100vw - 64px) !important;
+    max-width: calc(100vw - 64px) !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    flex-shrink: 0;
+    scroll-snap-align: center;
+    display: block !important;
   }
   
   .carousel-3d .navigation-arrows {
