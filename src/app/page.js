@@ -267,12 +267,16 @@ function Feature3DCarousel() {
           >
             {/* ChatGPT Dark Mode Card */}
             <div 
-              className={`w-full h-full rounded-xl border overflow-hidden transition-all duration-300 ${
+              className={`w-full h-full rounded-2xl border overflow-hidden transition-all duration-500 ease-out ${
                 index === currentIndex 
-                  ? 'shadow-[0_25px_60px_rgba(0,0,0,0.3)]' 
-                  : 'shadow-[0_20px_40px_rgba(0,0,0,0.2)]'
+                  ? 'shadow-[0_12px_32px_rgba(0,0,0,0.15)]' 
+                  : 'shadow-[0_8px_24px_rgba(0,0,0,0.08)]'
               }`}
-              style={{backgroundColor: '#212121', borderColor: '#4a4a4a'}}
+              style={{
+                backgroundColor: '#212121', 
+                borderColor: '#4a4a4a',
+                filter: index === currentIndex ? 'drop-shadow(0 8px 24px rgba(0, 0, 0, 0.08))' : 'none'
+              }}
             >
               {/* ChatGPT Header */}
               <ChatHeader title={feature.title} />
@@ -341,7 +345,38 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white">
+      <section className="relative overflow-hidden" style={{
+        background: `linear-gradient(to bottom, #e8ecf7 0%, #f9fafb 100%)`
+      }}>
+        {/* Radial Glow for Carousel Area */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at 50% 30%, rgba(0,0,0,0.04) 0%, transparent 60%)`,
+            filter: 'blur(60px)'
+          }}
+        ></div>
+        
+        {/* Subtle Grid Texture */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.025]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0,0,0,1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)
+            `,
+            backgroundSize: '32px 32px'
+          }}
+        ></div>
+        
+        {/* Subtle Grain Texture */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.02]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            mixBlendMode: 'multiply'
+          }}
+        ></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 sm:pt-24 sm:pb-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
@@ -353,10 +388,18 @@ export default function Home() {
               Onboard gives teachers like you structured paths to build confidence with tools like ChatGPT — with PD-credit alignment when available, and real value even when it&apos;s not.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="btn-primary text-lg px-8 py-4">
+              <button 
+                className="text-lg px-8 py-4 rounded-full font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                style={{
+                  background: 'linear-gradient(to right, #3b82f6, #6366f1)',
+                  boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)'
+                }}
+              >
                 Get the Free Prompt Pack
               </button>
-              <button className="btn-secondary text-lg px-8 py-4">
+              <button 
+                className="text-lg px-8 py-4 rounded-full font-medium text-gray-700 bg-white border border-gray-300 transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md"
+              >
                 Preview the Course
               </button>
             </div>
@@ -564,7 +607,9 @@ export default function Home() {
                 <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> 1 free module</li>
                 <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> Limited AI access</li>
               </ul>
-              <button className="btn-secondary w-full">Get Started</button>
+              <button className="w-full py-3 px-4 rounded-lg font-medium text-gray-700 bg-white border border-gray-300 transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md">
+                Get Started
+              </button>
             </div>
             <div className="card relative border-2 border-blue-500">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -577,7 +622,15 @@ export default function Home() {
                 <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> PDP certificate</li>
                 <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> Community access</li>
               </ul>
-              <button className="btn-primary w-full">Start Course</button>
+              <button 
+                className="w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                style={{
+                  background: 'linear-gradient(to right, #3b82f6, #6366f1)',
+                  boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)'
+                }}
+              >
+                Start Course
+              </button>
             </div>
             <div className="card relative">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Pro Plan</h3>
@@ -588,7 +641,9 @@ export default function Home() {
                 <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> Teacher journal</li>
                 <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> Bonus content</li>
               </ul>
-              <button className="btn-secondary w-full">Upgrade</button>
+              <button className="w-full py-3 px-4 rounded-lg font-medium text-gray-700 bg-white border border-gray-300 transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md">
+                Upgrade
+              </button>
             </div>
           </div>
         </div>
@@ -649,7 +704,14 @@ export default function Home() {
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
             Join thousands of teachers learning how to use AI with confidence. Start free, learn at your pace.
           </p>
-          <button className="bg-white text-blue-600 hover:bg-gray-50 font-semibold px-8 py-4 rounded-lg text-lg transition-all">
+          <button 
+            className="font-semibold px-8 py-4 rounded-full text-lg transition-all duration-200 hover:scale-105 hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(to right, #3b82f6, #6366f1)',
+              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
+              color: 'white'
+            }}
+          >
             Get Started with the Prompt Pack
           </button>
         </div>
